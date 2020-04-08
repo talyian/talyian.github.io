@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <style type=text/css>
+	body,html {margin:0px; padding:0px; }
+    #main {
+        display:grid;
+        grid-template-rows:calc(100vh - 1em) 1em;
+		grid-template-columns: repeat(2, 1fr);
+	}
+    #txt_source {
+        grid-column:1;
+    }
+    #cv {
+        grid-column:2;
+        width:100%;
+        height:100%;
+    }
+	#footer { grid-row:2; grid-column:1/3; }
+	#footer>em { display:inline-block; background:#def; border-radius:3px; margin:1px 10px;}
+  </style>
+  <body>
+
+  <div id=main>
+	<textarea id=txt_source></textarea>
+	<canvas id=cv></canvas>
+	<div id=footer>
+	  <em>Ctrl/Meta + Enter in editor to reload script</em>
+	  <em>mouse drag in viewport to change view</em>
+	  <em>
+	  Examples
+	  <select id=examples>
+		<option value="lindenmayer0">Lindenmayer Tree</option>
+		<option value="lindenmayer1">Lindenmayer Tree 3D</option>
+		<option value="penrose">Penrose Tiles</option>
+		<option value="sierpinski">Sierpinski Square</option>
+		<option value="menger">Menger Sponge</option>
+		<option value="castle">Castle</option>
+	  </select>
+	  </em>
+	</div>
+  </div>
+
+
+  <script type=text/javascript src=three.js></script>
+  <script type=text/javascript src=OrbitControls.js></script>   
+  <script type=text/javascript src=lsystems.js></script> 
+  <script type=text/javascript src=examples.js></script> 
