@@ -1,0 +1,157 @@
+<h1>Roots of 2</h1>
+
+<h2>An exploration into equal temperament</h2>
+
+Base Ratio: <input id=base_ratio type=text value="2/1" /> <br/>
+Number of Divisions <input id=num_divisions type=text value="12" /> <br />
+
+<input type=checkbox id=single_octave /> Single Octave - shift all notes to within the same octave. For example, we can create a true-temperament pentatonic scale by setting base ratio to 243/32 (i.e. 1.5 ^ 5) and divisions = 5. <br />
+<input type=text id=harmony_limit /> Harmony Limit <br />
+<table id=frequency_table>
+  <tbody>
+	
+  </tbody>
+</table>
+
+<script>
+  var base_ratio_n = 2,
+	  base_ratio_d = 1,
+	  divisions = 12,
+	  starting_freq = 200;
+
+  var scale = [];
+  var scale_o = [];
+  
+  function continued_fraction(n, l) {
+	  var i = n | 0;
+	  var f = n % 1;
+	  limit = Math.pow(1.5, l.length) / (10 * divisions);
+	  if (f < limit ) { 
+		  l.push(i);
+		  return l;
+	  }
+	  if (f > 1 - limit) {
+		  l.push(i + 1);
+		  return l;
+	  }
+	  l.push(i); 
+	  return continued_fraction(1 / f, l);
+  }
+  function value_of_cf(cf, r) {
+	  if (cf.length == 1) return [cf[0], 1, cf[0]];
+	  var v = value_of_cf(cf.slice(1));
+	  return [cf[0] * v[0] + v[1], v[0], cf[0] + 1 / v[2]];
+  }
+  
+  function generate_scale() {
+	  var base_ratio = document.getElementById("base_ratio").value.match(/(\d+)\/(\d+)/)
+	  var harmony_limit = (document.getElementById("harmony_limit").value | 0) || Infinity;
+	  base_ratio_n = base_ratio[1] | 0;
+	  base_ratio_d = base_ratio[2] | 0;
+	  divisions = document.getElementById("num_divisions").value | 0;
+
+	  var step = Math.pow(base_ratio_n / base_ratio_d, 1 / divisions)
+	  var scale = []
+	  var r = starting_freq, r0 = 1.0;
+	  while(frequency_table.rows.length)
+	      frequency_table.deleteRow(0);
+	  for(var i = 0; i <= divisions; i++) {
+		  var row = frequency_table.insertRow();
+		  var c;
+		  var cf = continued_fraction(r0, []);
+		  var r1 = value_of_cf(cf, 1);
+
+		  var rr = r;
+		  while(rr > starting_freq * 2.00001) {
+			  rr /= 2;
+		  }
+		  scale.push({
+			  index: scale.length,
+			  freq: r,
+			  freq_o: rr,
+			  ratio: r0,
+			  continued_frac: cf,
+			  aggreability: cf.length,
+			  rounded_ratio: r1[2],
+			  accuracy: Math.abs(r1[2] - r0) / r0,
+			  include: r1[1] < harmony_limit,
+		  });
+		  c = row.insertCell();
+		  c.innerHTML = scale[scale.length-1].include ? "x" : "";
+		  c = row.insertCell();
+		  c.innerHTML = r;
+		  c = row.insertCell();
+		  c.innerHTML = rr;
+		  c = row.insertCell();
+		  c.innerHTML = r0;
+		  c = row.insertCell();
+		  c.innerHTML = r1[0] + "/" + r1[1] + " ~ " + r1[2];
+		  c = row.insertCell();
+		  c.innerHTML = JSON.stringify(cf);
+		  c = row.insertCell();  
+		  r *= step;
+		  r0 *= step;
+	  }
+	  scale_o = scale.slice();
+	  scale_o.sort(function(a, b) {
+		  return a.freq_o < b.freq_o ? -1 :
+			  a.freq_o > b.freq_o ? 1 : 0; });
+	  return scale;
+  }
+  
+  var audio = new AudioContext();
+  var osc = audio.createOscillator();
+  var gain = audio.createGain();
+  gain.gain.value = 0.1;
+  osc.connect(gain);
+  gain.connect(audio.destination);
+  var started = false;
+
+  function play(freq, tstart, tstop) { 
+	  osc.frequency.setValueAtTime(freq, tstart);
+	  gain.gain.setValueAtTime(0, tstart);
+	  gain.gain.linearRampToValueAtTime(1, tstart * 0.90 + tstop * 0.1);
+	  gain.gain.linearRampToValueAtTime(0, tstop);
+  }
+  var n = 0;
+  var playTimer;
+  function playNextNote(t) {
+	  t = audio.currentTime;
+	  var x = 0;
+	  var sc = single_octave.checked ? scale_o : scale;
+	  do {
+		  if (x++ > sc.length) break;
+		  n = ++n % sc.length;
+	  } while (!sc[n].include);
+	  var f_attr = single_octave.checked ? 'freq_o' : 'freq';
+	  play(sc[n][f_attr], t, t + 0.2);
+	  playTimer = setTimeout(playNextNote, 400);
+  }
+
+
+  function start() {
+	  scale = generate_scale();
+	  if (!playTimer) { 
+		  if (!started) {
+			  osc.start(audio.currentTime);
+			  started = true;
+		  }
+		  t = audio.currentTime;
+		  playNextNote();
+	  }
+
+  }
+  single_octave.onclick = function(e) {
+	  start();
+  }
+
+  document.body.onkeydown = function(e) {
+	  if (e.keyCode == 0x0a || e.keyCode == 0x0d) {
+		  start();
+	  } else {
+		  gain.gain.value = 0;
+		  clearTimeout(playTimer);
+		  playTimer = 0;
+	  }
+  }
+  </script>
