@@ -113,7 +113,7 @@ Number of Divisions <input id=num_divisions type=text value="12" /> <br />
   var started = false;
 
   function play(freq, tstart, tstop) {
-	  var maxval = 0.5
+	  var maxval = 0.1
 	  osc.frequency.setValueAtTime(freq, tstart);
 	  gain.gain.setValueAtTime(0, tstart);
 	  gain.gain.linearRampToValueAtTime(maxval, tstart * 0.95 + tstop * 0.05);
