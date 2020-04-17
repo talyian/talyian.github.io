@@ -7,6 +7,7 @@ Number of Divisions <input id=num_divisions type=text value="12" /> <br />
 
 <input type=checkbox id=single_octave /> Single Octave - shift all notes to within the same octave. For example, we can create a true-temperament pentatonic scale by setting base ratio to 243/32 (i.e. 1.5 ^ 5) and divisions = 5. <br />
 <input type=text id=harmony_limit /> Harmony Limit <br />
+<a href="#" id=play_link>Play Scale</a>
 <table id=frequency_table>
   <tbody>
 	
@@ -76,12 +77,16 @@ Number of Divisions <input id=num_divisions type=text value="12" /> <br />
 			  accuracy: Math.abs(r1[2] - r0) / r0,
 			  include: r1[1] < harmony_limit,
 		  });
+		  
 		  c = row.insertCell();
 		  c.innerHTML = scale[scale.length-1].include ? "x" : "";
-		  c = row.insertCell();
-		  c.innerHTML = r;
-		  c = row.insertCell();
-		  c.innerHTML = rr;
+		  if (!single_octave.checked) { 
+			  c = row.insertCell();
+			  c.innerHTML = r;
+		  } else { 
+			  c = row.insertCell();
+			  c.innerHTML = rr;
+		  }
 		  c = row.insertCell();
 		  c.innerHTML = r0;
 		  c = row.insertCell();
@@ -107,10 +112,12 @@ Number of Divisions <input id=num_divisions type=text value="12" /> <br />
   gain.connect(audio.destination);
   var started = false;
 
-  function play(freq, tstart, tstop) { 
+  function play(freq, tstart, tstop) {
+	  var maxval = 0.5
 	  osc.frequency.setValueAtTime(freq, tstart);
 	  gain.gain.setValueAtTime(0, tstart);
-	  gain.gain.linearRampToValueAtTime(1, tstart * 0.90 + tstop * 0.1);
+	  gain.gain.linearRampToValueAtTime(maxval, tstart * 0.95 + tstop * 0.05);
+	  gain.gain.linearRampToValueAtTime(maxval, tstart * 0.60 + tstop * 0.4);
 	  gain.gain.linearRampToValueAtTime(0, tstop);
   }
   var n = 0;
@@ -124,7 +131,7 @@ Number of Divisions <input id=num_divisions type=text value="12" /> <br />
 		  n = ++n % sc.length;
 	  } while (!sc[n].include);
 	  var f_attr = single_octave.checked ? 'freq_o' : 'freq';
-	  play(sc[n][f_attr], t, t + 0.2);
+	  play(sc[n][f_attr], t, t + 0.4);
 	  playTimer = setTimeout(playNextNote, 400);
   }
 
@@ -141,6 +148,11 @@ Number of Divisions <input id=num_divisions type=text value="12" /> <br />
 	  }
 
   }
+  play_link.onclick = function(e) {
+	  start();
+	  e.preventDefault();
+	  return false;
+  };
   single_octave.onclick = function(e) {
 	  start();
   }
