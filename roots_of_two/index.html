@@ -1,169 +1,232 @@
-<h1>Roots of 2</h1>
 
-<h2>An exploration into equal temperament</h2>
+<style>
+  html { margin:0px; }
+  body {
+      max-width:1024px;
+      margin:0px auto;
+      font:14pt "Sitka Text","Candara";
+      display:grid;
+      grid-template-columns: 200px auto;
+  }
 
-Base Ratio: <input id=base_ratio type=text value="2/1" /> <br/>
-Number of Divisions <input id=num_divisions type=text value="12" /> <br />
+  input { padding:3px; margin-right:10px; }
+  h3 { padding:0px; margin-bottom:5px; border-radius:5px; }
+  .selector_ul {
+      list-style:none;
+      margin:0px;
+      padding:0px;
+  }
+  .selector_ul>li {
+      padding:10px; font-size:14pt; border-radius:5px;
+      border:1px solid white;
+  }
+  .selector_ul>li.selected {
+      background:#9af !important;
+  }
+  .selector_ul>li:hover { 
+      background:#aaa;
+  }
+  .div_detail { padding:0px 20px; }
+  .div_detail>div { display:none; }
+  .div_detail>.selected { display:block; }
 
-<input type=checkbox id=single_octave /> Single Octave - shift all notes to within the same octave. For example, we can create a true-temperament pentatonic scale by setting base ratio to 243/32 (i.e. 1.5 ^ 5) and divisions = 5. <br />
-<input type=text id=harmony_limit /> Harmony Limit <br />
-<a href="#" id=play_link>Play Scale</a>
+  #scale_keys_view td { cursor:pointer; }
+  #scale_keys_view tr:hover { background:#def; }
+</style>
+<div style='grid-column:1/3'>
+  <title>Roots of Two, Powers of Three</title>
+  <h1>Roots of Two, Powers of Three</h1>
+  <p>
+    An exploration into musical scales. How do we choose the notes for a scale?
+  </p>
+</div>
+
+<h3 data-target=base_scale_div>Base Scale</h3> 
+<div id=base_scale_div
+     style='display:grid; grid-column:1/-1;grid-template-columns:200px auto'>
+<p style='grid-column:1/-1'>
+  In all the music systems I looked at, you have some rules for generating "all the possible notes in music". These tend to be rules to generate a set of notes within an octave, which is a fundamental divison in music because of how similar two tones in an octave are. 
+</p>
+<ul id=scale_selector class=selector_ul style='grid-column:1'>
+  <li class=selected>Equal Temperament</li>
+  <li>Circle of Fifths</li>
+  <li>Shruti</li>
+</ul>
+
+<div id=page_detail class=div_detail style='grid-column:2'>
+  <div class='page selected'>
+    <div class=body style='display:grid'>
+      <p>
+        Equal Temperament Scale. A scale where the interval between adjacent notes is a constant. This means that the interval will generally be an irrational number and be slightly dissonant. However, the scale has no singularly bad interval (a "wolf" interval) and transposes easily. 
+      </p>
+      <div>
+        <input type=text value=220 id=tet_freq />Starting Frequency
+      </div>
+      <div>
+        <input type=text value=12 id=tet_n />Number of Notes
+      </div>
+      <div>
+        <input type=text value=2 id=tet_ratio />Ending Frequency Ratio 
+      </div>
+    </div>
+
+      <a href='#' onclick='play_scale(this, basal_scale = new EqualTemperamentScale(tet_freq.value, tet_n.value, tet_ratio.value)); return false;'>Play</a>
+  </div>
+
+  <div class=page>
+    <div class=body style='display:grid'>
+      <p>
+        The perfect fifth is an interval where the frequency ratio is 3/2. You can extend this chord 12 times to get a near-octave - 3^12 is within 1.4% of 2^19.  All notes on the scale are a product of some power of 3 and 2. This scale is called Pythagorean tuning in the West and is attributed to Pythagoras, but was also used as the basis for ancient Chinese musical scales, where it is known as the Shi Er Lu (The Twelve Notes).   
+      </p>
+        <div>
+          <input type=text value=300 id=pyth_freq />Central Frequency
+        </div>
+        <div>
+          <input type=text value=6 id=pyth_n />Number of Positive Powers of 3
+        </div>
+        <div>
+          <input type=text value=5 id=pyth_n2 />Number of Negative Powers of 3
+        </div>
+        <div>
+          <input type=text value=1 id=pyth_octaves />Number of Octaves in Range
+        </div>
+    </div>
+    <a href='#' onclick='play_scale(this, basal_scale = new PythagoreanScale(pyth_freq.value, pyth_n2.value, pyth_n.value, pyth_octaves.value)); return false;'>Play</a>
+    
+  </div>
+  <div class=page>
+    <p>
+      The Shruti are a set of 22 notes used in Indian music; They are chosen by a type of 5-limit tuning. It is not used directly; rather subsets of the notes in the Shruti form musical modes called ragas that inform the theme of the composition.
+
+      The wikipedia shruti scale uses at most one perfect third, i.e. a 5/4 interval in combination with up to 6 perfect fifths, i.e. a 3/2 interval.  
+    </p>
+    <div>
+      <input type=text value=300 id=shruti_freq />Central Frequency
+    </div>
+    <a href='#' onclick='play_scale(this, basal_scale = new Shruti(shruti_freq.value)); return false;'>Play</a>
+  </div>
+</div>
+</div> <!-- end base scale region -->
+
+<h3 data-target=mode_div
+    style='grid-column:1/-1'
+    onmousedown='toggle_visibility(this); return false;'>Musical Mode as a Filter</h3>
+<div id=mode_div style='display:grid; grid-template-columns:240px auto;grid-column:1/-1'>
+  <p style='grid-column:1/-1'>
+    A base scale tends to have too many notes, and not all of them sound good with each other. Can we choose a subset of the base scale so that it sounds more pleasing? I'm going to call this concept a mode, which in music theory is a set of notes with some melodic characteristic. For example, in Western music, you can pick 7-note Greek modes out of a 12-note chromatic scale, or you can pick 5-note pentatonic modes out of a variety of base scales.  
+  </p>
+  <ul id=mode_selector class=selector_ul style='grid-column:1'>
+    <li class=selected>No Modal Filter</li>
+    <li>Smallest Fractions</li>
+    <li>Uniform Division</li>
+    <li>Minimize Dissonance</li>  
+  </ul>
+  
+  <div id=mode_detail class=div_detail style='padding-left:10px'>
+
+    <div class='selected'>
+      No modal filter. Play the whole base scale.
+    </div>
+
+    <div>
+      <p>
+      Smallest Fractions. Maybe the "best" notes are the notes that have the "nicest" fractions, i.e. the numerator and denominator are small. By this logic, 9/8 is a better fraction than 256/243.
+      </p>
+      <div>
+        <input type=text value=7 id=mode_smallest_n> Number of Notes in scale
+        </div><div>
+        <input type=text id=mode_magnitude_limit>Maximum value for numerator and denominator.
+      </div>
+      <a href='#' onclick='play_scale(this, new SmallestFractionFilter(basal_scale, mode_smallest_n.value, mode_magnitude_limit.value)); return false;'>Play</a>
+      
+    </div>
+
+    <div>
+      <p>Uniform Division. Try to break the scale down into N equally spaced tones, picking the closest match.</p>
+      <div><b>Not Implemented</b></div>
+      <div>
+        <input type=text id=mode_uniform_n>Number of Notes in scale
+      </div><div>
+        <input type=text id=mode_uniform_limit>Maximum error limit.
+      </div>
+    </div>
+
+    <div>
+      <p>Minimize Dissonance. Many scales will have one or more "wolf" intervals which sound really discordant. Can we take a selection of notes and find a subset that minimizes pairwise dissonance over all pairs of notes in the scale?</p>
+      <div><b>Not Implemented</b></div>
+    </div>
+  </div>
+</div>
+
+<h3 id=scale_view_h3 data-target=player_div
+    style='grid-column:1/-1'
+    onmousedown='toggle_visibility(this); return false;'>Scale View</h3>
+
+<div id=player_div style='grid-column:1/-1'>
+  <!-- table with all the keys, their frequencies, and their ratio to the base -->
+  <table id=scale_keys_view>
+    
+  </table>
+  <div id=scale_ratios_table>
+
+  </div>
+  <div id=scale_enharmonicity>
+
+  </div>
+</div>
+
+<h3 style='grid-column:1/-1' data-target='rational_options'
+    onmousedown='toggle_visibility(this); return false;'>
+  Rational Approximation (Continued Fraction) Options</h3>
+
+<div id=rational_options style='grid-column:1/-1; display:none;grid-template-columns:auto auto'>
+  <input type=text id=rat_limit value=10 /> Term Limit
+  <input type=text id=rat_cutoff value=20 /> Maximum Term Cutoff
+  <input type=text id=rat_cutoff_start value=2 /> Cutoff Start
+  </div>
+</div>
+
 <table id=frequency_table>
   <tbody>
 	
   </tbody>
 </table>
 
-<script>
-  var base_ratio_n = 2,
-	  base_ratio_d = 1,
-	  divisions = 12,
-	  starting_freq = 200;
-
-  var scale = [];
-  var scale_o = [];
-  
-  function continued_fraction(n, l) {
-	  var i = n | 0;
-	  var f = n % 1;
-	  limit = Math.pow(1.5, l.length) / (10 * divisions);
-	  if (f < limit ) { 
-		  l.push(i);
-		  return l;
-	  }
-	  if (f > 1 - limit) {
-		  l.push(i + 1);
-		  return l;
-	  }
-	  l.push(i); 
-	  return continued_fraction(1 / f, l);
+<script> // navigation
+  var basal_scale = null;
+  function setup_navigation(nav_tags, nav_targets) {
+      var selected_tag = nav_tags[0];
+      var selected_page = nav_targets[0];
+      [].map.call(nav_tags, function(x, i) {
+          x.dataset.index = i;
+          x.addEventListener("click", () => {
+              var y = nav_targets[x.dataset.index];
+              selected_tag.className = null;
+              selected_tag = x;
+              selected_page && (selected_page.className = null);
+              selected_page = y;
+              y && (y.className = "selected");
+              x.className = "selected";
+          });
+      });
   }
-  function value_of_cf(cf, r) {
-	  if (cf.length == 1) return [cf[0], 1, cf[0]];
-	  var v = value_of_cf(cf.slice(1));
-	  return [cf[0] * v[0] + v[1], v[0], cf[0] + 1 / v[2]];
+  setup_navigation(scale_selector.getElementsByTagName("li"), page_detail.children);
+  setup_navigation(mode_selector.getElementsByTagName("li"), mode_detail.children);
+  function toggle_visibility(trigger) {
+      var target = document.getElementById(trigger.dataset.target);
+      console.log('toggle', target, trigger);
+      if (target.style.display == 'none') {
+          target.style.display = 'grid';
+          trigger.style.color = '';
+      } else { 
+          target.style.display = 'none';
+          trigger.style.color = '#999';
+      }
   }
-  
-  function generate_scale() {
-	  var base_ratio = document.getElementById("base_ratio").value.match(/(\d+)\/(\d+)/)
-	  var harmony_limit = (document.getElementById("harmony_limit").value | 0) || Infinity;
-	  base_ratio_n = base_ratio[1] | 0;
-	  base_ratio_d = base_ratio[2] | 0;
-	  divisions = document.getElementById("num_divisions").value | 0;
-
-	  var step = Math.pow(base_ratio_n / base_ratio_d, 1 / divisions)
-	  var scale = []
-	  var r = starting_freq, r0 = 1.0;
-	  while(frequency_table.rows.length)
-	      frequency_table.deleteRow(0);
-	  for(var i = 0; i <= divisions; i++) {
-		  var row = frequency_table.insertRow();
-		  var c;
-		  var cf = continued_fraction(r0, []);
-		  var r1 = value_of_cf(cf, 1);
-
-		  var rr = r;
-		  while(rr > starting_freq * 2.00001) {
-			  rr /= 2;
-		  }
-		  scale.push({
-			  index: scale.length,
-			  freq: r,
-			  freq_o: rr,
-			  ratio: r0,
-			  continued_frac: cf,
-			  aggreability: cf.length,
-			  rounded_ratio: r1[2],
-			  accuracy: Math.abs(r1[2] - r0) / r0,
-			  include: r1[1] < harmony_limit,
-		  });
-		  
-		  c = row.insertCell();
-		  c.innerHTML = scale[scale.length-1].include ? "x" : "";
-		  if (!single_octave.checked) { 
-			  c = row.insertCell();
-			  c.innerHTML = r;
-		  } else { 
-			  c = row.insertCell();
-			  c.innerHTML = rr;
-		  }
-		  c = row.insertCell();
-		  c.innerHTML = r0;
-		  c = row.insertCell();
-		  c.innerHTML = r1[0] + "/" + r1[1] + " ~ " + r1[2];
-		  c = row.insertCell();
-		  c.innerHTML = JSON.stringify(cf);
-		  c = row.insertCell();  
-		  r *= step;
-		  r0 *= step;
-	  }
-	  scale_o = scale.slice();
-	  scale_o.sort(function(a, b) {
-		  return a.freq_o < b.freq_o ? -1 :
-			  a.freq_o > b.freq_o ? 1 : 0; });
-	  return scale;
-  }
-  
-  var audio = new AudioContext();
-  var osc = audio.createOscillator();
-  var gain = audio.createGain();
-  gain.gain.value = 0.1;
-  osc.connect(gain);
-  gain.connect(audio.destination);
-  var started = false;
-
-  function play(freq, tstart, tstop) {
-	  var maxval = 0.1
-	  osc.frequency.setValueAtTime(freq, tstart);
-	  gain.gain.setValueAtTime(0, tstart);
-	  gain.gain.linearRampToValueAtTime(maxval, tstart * 0.95 + tstop * 0.05);
-	  gain.gain.linearRampToValueAtTime(maxval, tstart * 0.60 + tstop * 0.4);
-	  gain.gain.linearRampToValueAtTime(0, tstop);
-  }
-  var n = 0;
-  var playTimer;
-  function playNextNote(t) {
-	  t = audio.currentTime;
-	  var x = 0;
-	  var sc = single_octave.checked ? scale_o : scale;
-	  do {
-		  if (x++ > sc.length) break;
-		  n = ++n % sc.length;
-	  } while (!sc[n].include);
-	  var f_attr = single_octave.checked ? 'freq_o' : 'freq';
-	  play(sc[n][f_attr], t, t + 0.4);
-	  playTimer = setTimeout(playNextNote, 400);
-  }
-
-
-  function start() {
-	  scale = generate_scale();
-	  if (!playTimer) { 
-		  if (!started) {
-			  osc.start(audio.currentTime);
-			  started = true;
-		  }
-		  t = audio.currentTime;
-		  playNextNote();
-	  }
-
-  }
-  play_link.onclick = function(e) {
-	  start();
-	  e.preventDefault();
-	  return false;
-  };
-  single_octave.onclick = function(e) {
-	  start();
-  }
-
-  document.body.onkeydown = function(e) {
-	  if (e.keyCode == 0x0a || e.keyCode == 0x0d) {
-		  start();
-	  } else {
-		  gain.gain.value = 0;
-		  clearTimeout(playTimer);
-		  playTimer = 0;
-	  }
-  }
-  </script>
+</script>
+<script src=scale.js> </script>
+<script src=modes.js> </script>
+<script src=rational.js> </script>
+<script src=player.js> </script>
+<script src=visuals.js> </script>
+<script src=keyboard.js> </script
