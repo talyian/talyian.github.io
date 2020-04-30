@@ -86,6 +86,22 @@ function Tree(n, m, gl) {
 }
 
 `;
+var lindenmayer0_1 = `LSystem(
+    "Start F", 6,
+    {"F" : "F[+F]F[-F][F]"},
+    {
+        "Start": function (T) { T.level = 0; },
+        "F": function (T) { 
+             T.rotate3D(0, 1, 0, Math.random() * 30);
+             T.color.setRGB(1 - T.level / 7, T.level / 6, 0); 
+             T.forward(0.2); 
+        },
+        "[": function (T) { T.push(); T.level++; },
+        "]": function (T) { T.pop(); T.level--; },
+        "+": function (T) { T.rotate(26.7); },
+        "-": function (T) { T.rotate(-26.7); }
+    })`;
+
 var lindenmayer1 = `
 
 Turtle.prototype.treeTrunk = function(h) {
@@ -255,6 +271,7 @@ LSystem(
 
 var example_map = {
 	"lindenmayer0": lindenmayer0,
+    "lindenmayer0_1": lindenmayer0_1,
 	"lindenmayer1": lindenmayer1,
 	"sierpinski": sierpinski_square,
 	"penrose": penrose,
