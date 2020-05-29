@@ -11,6 +11,7 @@ var freq_i = [0, 0.147621, 0, 0.000007, -0.00001, 0.000005, -0.000006, 0.000009,
              -0.000009, 0.000009, -0.000005, 0.000002, -0.000007, 0.000005,
              -0.000005, 0.000005, -0.000023, 0.000037, -0.000021, 0.000022,
              -0.000006, 0.000005, -0.000004, 0.000014, -0.000007, 0.000012];
+
 var wave = audio.createPeriodicWave(freq_r, freq_i);
 
 function play_note(note, instrument) {
@@ -32,7 +33,6 @@ var now_playing = null;
 function play_scale(el, scale) {
     show_scale(el, scale);
     if (now_playing) { now_playing.stop(); now_playing = null; return; }
-    console.log("playing scale", arguments);
     var t = audio.currentTime, i = 0;
     var notes = Array.from(scale.notes())
     for(var note of notes) {
@@ -64,12 +64,14 @@ function show_scale(el, scale) {
         td = tr.insertCell();
         td.innerHTML = note.ratio;
         tr.addEventListener("mousedown", () => {
-            play_note({wave:wave,
-                       frequency:note.frequency,
-                       time:audio.currentTime,
-                       attack:0,
-                       duration:0.3,
-                       volume:0.1});
+            play_note({
+                wave:wave,
+                frequency:note.frequency,
+                time:audio.currentTime,
+                attack:0,
+                duration:0.3,
+                volume:0.1
+            });
         });
     });
 }
@@ -78,7 +80,6 @@ document.onkeydown = function keypress(e) {
     function play_key(n) {
         scale_keys_view.rows[n].dispatchEvent(new MouseEvent("mousedown"))
     };
-    console.log('wat', e)
     switch(e.key) {
     case '`': play_key(1); break;
     case '1': play_key(2); break;

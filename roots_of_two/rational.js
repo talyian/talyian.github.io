@@ -1,8 +1,9 @@
-
 function Ratio(num, denom) {
     this.n = num;
     this.d = denom;
 }
+Ratio.prototype.toString = function() { return `${this.n}/${this.d}`; };
+
 function RationalApproximate(value, opts) {
     if (!opts) {
         opts = {};
@@ -32,4 +33,3 @@ function RationalApproximate(value, opts) {
     console.log('continued', vv, approx, `${n}/${d}`);
     return new Ratio(n, d);
 }
-Ratio.prototype.toString = function() { return `${this.n}/${this.d}`; };
