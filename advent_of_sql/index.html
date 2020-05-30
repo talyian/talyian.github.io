@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2020-05-30 Sat 16:04 -->
+<!-- 2020-05-30 Sat 16:36 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Advent of Code 2019 in SQL</title>
@@ -12,7 +12,6 @@
 <style type='text/css'>
 body { font: 16pt Helvetica, Calibri; max-width:1000px; margin:auto; }
 .src { background:#333; padding:15px; color:#eee; }
-pre { white-space: pre-wrap; }
 </style>
 <script type="text/javascript">
 /*
@@ -68,26 +67,27 @@ for the JavaScript code in this tag.
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga5aa7ac">1. Advent of Code 2019 in SQL</a></li>
-<li><a href="#org274a3db">2. Day 1: Rocket Fuel</a></li>
-<li><a href="#org200aae2">3. Day 2: Virtual Machine Interpreter</a>
+<li><a href="#orga6736f6">1. Advent of Code 2019 in SQL</a></li>
+<li><a href="#org9235c56">2. Day 1: Rocket Fuel</a></li>
+<li><a href="#orga9ac409">3. Day 2: Virtual Machine Interpreter</a>
 <ul>
-<li><a href="#org04ad750">3.1. The solution</a></li>
+<li><a href="#org0ca1ed0">3.1. The solution</a></li>
 </ul>
 </li>
-<li><a href="#orga35ce60">4. Day 3 - Crossed Wires</a></li>
-<li><a href="#org7a29c54">5. Day 4 - Secure Container</a>
+<li><a href="#orgadddb89">4. Day 3 - Crossed Wires</a></li>
+<li><a href="#org1470f36">5. Day 4 - Secure Container</a>
 <ul>
-<li><a href="#org7cdcf72">5.1. Solution</a></li>
+<li><a href="#org2d54a07">5.1. Solution</a></li>
 </ul>
 </li>
-<li><a href="#org94f9604">6. Conclusions</a></li>
+<li><a href="#org67892e2">6. Conclusions</a></li>
+<li><a href="#org06d59d2">7. Bonus: Mandelbrot</a></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orga5aa7ac" class="outline-2">
-<h2 id="orga5aa7ac"><span class="section-number-2">1</span> Advent of Code 2019 in SQL</h2>
+<div id="outline-container-orga6736f6" class="outline-2">
+<h2 id="orga6736f6"><span class="section-number-2">1</span> Advent of Code 2019 in SQL</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 SQL supports recursion in Common Table Expressions (CTEs) and so is
@@ -98,8 +98,8 @@ implementing <a href="https://adventofcode.com/2019">Advent of Code 2019 problem
 </div>
 </div>
 
-<div id="outline-container-org274a3db" class="outline-2">
-<h2 id="org274a3db"><span class="section-number-2">2</span> Day 1: Rocket Fuel</h2>
+<div id="outline-container-org9235c56" class="outline-2">
+<h2 id="org9235c56"><span class="section-number-2">2</span> Day 1: Rocket Fuel</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 Okay, so in Day 1 we have a rocket fuel equation: for every V units of
@@ -148,8 +148,8 @@ Okay, that was pretty easy! Maybe writing logic in SQL isn't that bad!
 </div>
 </div>
 
-<div id="outline-container-org200aae2" class="outline-2">
-<h2 id="org200aae2"><span class="section-number-2">3</span> Day 2: Virtual Machine Interpreter</h2>
+<div id="outline-container-orga9ac409" class="outline-2">
+<h2 id="orga9ac409"><span class="section-number-2">3</span> Day 2: Virtual Machine Interpreter</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Uh oh. This seems a lot more involved than Day 1. 
@@ -244,8 +244,8 @@ In Part 2, figure out for which starting values &lt; 100 at index 1 and 2 result
 </p>
 </div>
 
-<div id="outline-container-org04ad750" class="outline-3">
-<h3 id="org04ad750"><span class="section-number-3">3.1</span> The solution</h3>
+<div id="outline-container-org0ca1ed0" class="outline-3">
+<h3 id="org0ca1ed0"><span class="section-number-3">3.1</span> The solution</h3>
 <div class="outline-text-3" id="text-3-1">
 <p>
 After writing about 200 lines of really messy SQL and having huge issues debugging, I decided to encode the array as a JSON column, since most SQL databases these days have some kind of JSON format. This way, reading and writing memory is simply calls to <code>json_replace</code> and <code>json_extract</code>.  
@@ -342,8 +342,8 @@ program <span style="color: #00ffff;">as</span> (
 </div>
 </div>
 
-<div id="outline-container-orga35ce60" class="outline-2">
-<h2 id="orga35ce60"><span class="section-number-2">4</span> Day 3 - Crossed Wires</h2>
+<div id="outline-container-orgadddb89" class="outline-2">
+<h2 id="orgadddb89"><span class="section-number-2">4</span> Day 3 - Crossed Wires</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 Given a series of Directions and Lengths, calculate the positions where two wires cross. Both wires start at the origin, so the crossing represents a loop of wire.
@@ -358,21 +358,21 @@ In Part 2: find the shortest intersection by total wire distance in loop.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-sqlite">.headers <span style="color: #00ffff;">on</span>
+<pre class="src src-sqlite"><span style="color: #ffa07a;">.headers on</span>
 ;<span style="color: #00ffff;">with</span> raw_input(wire, input_str) <span style="color: #00ffff;">as</span> (<span style="color: #00ffff;">select</span> wire, input_str <span style="color: #00ffff;">from</span> input_day3 <span style="color: #00ffff;">where</span> test_case = 2)
 ,w1 <span style="color: #00ffff;">as</span> ( <span style="color: #ff7f24;">-- split an entry into direction string and length</span>
    <span style="color: #00ffff;">select</span> wire,
-     substr(input_str, 0, instr(input_str, <span style="color: #ffa07a;">','</span>)) d,
-     substr(input_str, instr(input_str, <span style="color: #ffa07a;">','</span>)+1) str
+     <span style="color: #b0c4de;">substr</span>(input_str, 0, instr(input_str, <span style="color: #ffa07a;">','</span>)) d,
+     <span style="color: #b0c4de;">substr</span>(input_str, instr(input_str, <span style="color: #ffa07a;">','</span>)+1) str
      <span style="color: #00ffff;">from</span> raw_input
    <span style="color: #00ffff;">union</span> <span style="color: #00ffff;">all</span>
    <span style="color: #00ffff;">select</span> wire,
-     <span style="color: #00ffff;">case</span> instr(str, <span style="color: #ffa07a;">','</span>) <span style="color: #00ffff;">when</span> 0 <span style="color: #00ffff;">then</span> str <span style="color: #00ffff;">else</span> substr(str, 0, instr(str, <span style="color: #ffa07a;">','</span>)) <span style="color: #00ffff;">end</span>,
-     <span style="color: #00ffff;">case</span> instr(str, <span style="color: #ffa07a;">','</span>) <span style="color: #00ffff;">when</span> 0 <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">NULL</span> <span style="color: #00ffff;">else</span> substr(str, instr(str, <span style="color: #ffa07a;">','</span>) + 1) <span style="color: #00ffff;">end</span> 
+     <span style="color: #00ffff;">case</span> instr(str, <span style="color: #ffa07a;">','</span>) <span style="color: #00ffff;">when</span> 0 <span style="color: #00ffff;">then</span> str <span style="color: #00ffff;">else</span> <span style="color: #b0c4de;">substr</span>(str, 0, instr(str, <span style="color: #ffa07a;">','</span>)) <span style="color: #00ffff;">end</span>,
+     <span style="color: #00ffff;">case</span> instr(str, <span style="color: #ffa07a;">','</span>) <span style="color: #00ffff;">when</span> 0 <span style="color: #00ffff;">then</span> <span style="color: #00ffff;">NULL</span> <span style="color: #00ffff;">else</span> <span style="color: #b0c4de;">substr</span>(str, instr(str, <span style="color: #ffa07a;">','</span>) + 1) <span style="color: #00ffff;">end</span> 
    <span style="color: #00ffff;">from</span> w1 <span style="color: #00ffff;">where</span> str <span style="color: #00ffff;">is</span> <span style="color: #00ffff;">NOT</span> <span style="color: #00ffff;">NULL</span>
 )
 , wire <span style="color: #00ffff;">as</span> (
-   <span style="color: #00ffff;">select</span> wire, substr(d, 1, 1) dir, <span style="color: #b0c4de;">cast</span> (substr(d, 2) <span style="color: #00ffff;">as</span> <span style="color: #98fb98;">int</span>) len,
+   <span style="color: #00ffff;">select</span> wire, <span style="color: #b0c4de;">substr</span>(d, 1, 1) dir, <span style="color: #00ffff;">cast</span> (<span style="color: #b0c4de;">substr</span>(d, 2) <span style="color: #00ffff;">as</span> <span style="color: #98fb98;">int</span>) len,
    row_number() over () i
    <span style="color: #00ffff;">from</span> w1
 )
@@ -426,8 +426,8 @@ In Part 2: find the shortest intersection by total wire distance in loop.
 </div>
 
 
-<div id="outline-container-org7a29c54" class="outline-2">
-<h2 id="org7a29c54"><span class="section-number-2">5</span> Day 4 - Secure Container</h2>
+<div id="outline-container-org1470f36" class="outline-2">
+<h2 id="org1470f36"><span class="section-number-2">5</span> Day 4 - Secure Container</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 Given a minimum and maximum of a number range, find all password
@@ -445,8 +445,8 @@ For Part 2: The pair of repeated digits cannot be part of a longer series of rep
 </p>
 </div>
 
-<div id="outline-container-org7cdcf72" class="outline-3">
-<h3 id="org7cdcf72"><span class="section-number-3">5.1</span> Solution</h3>
+<div id="outline-container-org2d54a07" class="outline-3">
+<h3 id="org2d54a07"><span class="section-number-3">5.1</span> Solution</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 This seems like a pretty straightforward problem, so I'm going to avoid using JSON and do everything relationally.
@@ -513,8 +513,8 @@ decreasing_pair <span style="color: #00ffff;">as</span> (<span style="color: #00
 </div>
 </div>
 
-<div id="outline-container-org94f9604" class="outline-2">
-<h2 id="org94f9604"><span class="section-number-2">6</span> Conclusions</h2>
+<div id="outline-container-org67892e2" class="outline-2">
+<h2 id="org67892e2"><span class="section-number-2">6</span> Conclusions</h2>
 <div class="outline-text-2" id="text-6">
 <ul class="org-ul">
 <li>???</li>
@@ -523,10 +523,68 @@ decreasing_pair <span style="color: #00ffff;">as</span> (<span style="color: #00
 </ul>
 </div>
 </div>
+
+<div id="outline-container-org06d59d2" class="outline-2">
+<h2 id="org06d59d2"><span class="section-number-2">7</span> Bonus: Mandelbrot</h2>
+<div class="outline-text-2" id="text-7">
+<div class="org-src-container">
+<pre class="src src-sqlite">;<span style="color: #00ffff;">with</span> x <span style="color: #00ffff;">as</span> (
+  <span style="color: #00ffff;">select</span> -1.8 x <span style="color: #00ffff;">union</span> <span style="color: #00ffff;">all</span>
+  <span style="color: #00ffff;">select</span> x + 0.03 <span style="color: #00ffff;">from</span> x <span style="color: #00ffff;">where</span> x &lt; 0.7),
+y <span style="color: #00ffff;">as</span> (
+  <span style="color: #00ffff;">select</span> -1 y <span style="color: #00ffff;">union</span> <span style="color: #00ffff;">all</span>
+  <span style="color: #00ffff;">select</span> y + 0.1 <span style="color: #00ffff;">from</span> y <span style="color: #00ffff;">where</span> y &lt; 1),
+mandelbrot <span style="color: #00ffff;">as</span> (
+  <span style="color: #00ffff;">select</span> <span style="color: #ffa07a;">' '</span> c, 0 gen, 0 x, 0 y, x x0, y y0 <span style="color: #00ffff;">from</span> x <span style="color: #00ffff;">cross</span> <span style="color: #00ffff;">join</span> y
+  <span style="color: #00ffff;">union</span> <span style="color: #00ffff;">all</span>
+  <span style="color: #00ffff;">select</span> <span style="color: #00ffff;">case</span> <span style="color: #00ffff;">when</span> gen &gt;= 30 <span style="color: #00ffff;">then</span> <span style="color: #ffa07a;">'#'</span> <span style="color: #00ffff;">else</span> <span style="color: #ffa07a;">' '</span> <span style="color: #00ffff;">end</span>,
+    gen + 1, x * x - y * y + x0, 2 * x * y + y0, x0, y0
+    <span style="color: #00ffff;">from</span> mandelbrot
+   <span style="color: #00ffff;">where</span> gen &lt;= 30 <span style="color: #00ffff;">and</span> x &lt; 2 <span style="color: #00ffff;">and</span> y &lt; 2
+),
+last_entries <span style="color: #00ffff;">as</span> (
+   <span style="color: #00ffff;">select</span> c, x0, y0, gen, row_number() over (partition <span style="color: #00ffff;">by</span> x0, y0 <span style="color: #00ffff;">order</span> <span style="color: #00ffff;">by</span> gen <span style="color: #00ffff;">desc</span>) rn
+   <span style="color: #00ffff;">from</span> mandelbrot
+)
+<span style="color: #00ffff;">select</span> <span style="color: #ffa07a;">'.'</span> || <span style="color: #b0c4de;">group_concat</span>(c, <span style="color: #ffa07a;">''</span>)
+<span style="color: #00ffff;">from</span> last_entries
+<span style="color: #00ffff;">where</span> rn = 1
+<span style="color: #00ffff;">group</span> <span style="color: #00ffff;">by</span> y0;
+
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-sqlite">".                                                            #                        "
+".                                                       ##                            "
+".                                                     #######                         "
+".                                                     #######                         "
+".                                          ### ################### #  #               "
+".                                         ##############################              "
+".                                       #################################             "
+".                           #          ###################################            "
+".                      ###########   #######################################          "
+".                   ######################################################            "
+".#####################################################################                "
+".                   ######################################################            "
+".                      ###########   #######################################          "
+".                           #         ####################################            "
+".                                       #################################             "
+".                                         ##############################              "
+".                                          ### ################### #  #               "
+".                                                     ######                          "
+".                                                     #######                         "
+".                                                       ##                            "
+".                                                            #                        "
+".                                                                                     "
+</pre>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Jimmy Tang</p>
-<p class="date">Created: 2020-05-30 Sat 16:04</p>
+<p class="date">Created: 2020-05-30 Sat 16:36</p>
 <p class="validation"></p>
 </div>
 </body>
