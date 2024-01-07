@@ -1,0 +1,56 @@
+<html>
+<style>
+  canvas { position:absolute; width:800px; height:800px;}
+</style>
+<canvas id=canvas0 width=800 height=800 style='background:black'> </canvas>
+<canvas id=canvas1 width=800 height=800> </canvas>
+<script>
+let ctx_arms = canvas1.getContext('2d')
+ctx_arms.strokeStyle = 'rgba(255,255,255,1)';
+ctx_arms.lineWidth = 1.3;
+ctx_arms.fillRect(0,0,800,800);
+
+let ctx = canvas0.getContext('2d')
+ctx.fillStyle = 'rgba(0,0,0, 0.05)';
+
+function Turtle(N) {
+  this.N = N;
+  this.x = 0;
+  this.y = 0;
+  this.color = `rgb(${127 + 127 * Math.sin(N)}, ${127 + 127 * Math.sin(N+2)}, 100)`;
+}
+
+Turtle.prototype.draw_segment = function(t) {
+  let c1 = {x:Math.sin(this.N + (this.N + 1) * t), y:Math.cos(this.N + (this.N + 1) * t)};
+  let c2 = {x:Math.cos((5 * this.N + 6)*t), y:Math.sin((5 * this.N + 6) * t)};
+  // draw circle arms
+  ctx_arms.beginPath();
+  ctx_arms.moveTo(400,400);
+  ctx_arms.lineTo(400 + 50 * this.N * c1.x, 400 + 50 * this.N * c1.y);
+  ctx_arms.lineTo(400 + 50 * this.N * c1.x + 25 * c2.x, 400 + 50 * this.N * c1.y + 25 * c2.y);
+  ctx_arms.stroke();
+
+  // draw colored path
+  let new_x = 2 * this.N * c1.x + c2.x
+  let new_y = 2 * this.N * c1.y + c2.y
+  if (this.x || this.y) {
+     ctx.strokeStyle = this.color
+     ctx.beginPath();
+     ctx.moveTo(25 * this.x + 400, 25 * this.y + 400);
+     ctx.lineTo(25 * new_x + 400, 25 * new_y + 400);
+     ctx.stroke()
+  }
+  this.x = new_x;
+  this.y = new_y;
+}
+
+let turtles = [], frame = 0;
+for(var i = 1; i < 8;i++) turtles.push(new Turtle(i));
+requestAnimationFrame(function render() {
+  frame+=0.002;
+  ctx_arms.clearRect(0,0,800,800);
+  if ((frame * 500) % 30 < 0.1) { ctx.fillRect(0,0,800,800); }
+  turtles.forEach((t)=> t.draw_segment(frame));
+  requestAnimationFrame(render);
+})
+</script>
