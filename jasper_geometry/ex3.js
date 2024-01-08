@@ -1,6 +1,7 @@
 (function() {
 var canvas = document.getElementById('canvas2')
 var ctx = canvas.getContext('2d')
+ctx.fillStyle = 'rgba(255,255,255,0.05)'
 
 function getPoint(t) {
   let x = 200 + 100 * Math.sin(t);
@@ -18,6 +19,7 @@ setTimeout(function render(t) {
    ctx.lineTo(200, 200);
    ctx.stroke();
    frame += 0.1;
+   if (frame % 1 < 0.2) ctx.fillRect(0, 0, 400, 400);
    setTimeout(render, 500);
 }, 500)
 })()

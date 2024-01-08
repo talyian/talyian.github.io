@@ -55,6 +55,9 @@ if we have the function itself request another animation frame, then it fires ab
 Every frame, we move from the previous point to the new point and draw that small
 line segment.
 
+I've also added a small fade by setting a tranparent fillStyle. This helps us
+to see what we're drawing.
+
 #+begin_src html
 <canvas id=canvas1 width=400 height=400> </canvas>
 #+end_src
@@ -63,6 +66,7 @@ line segment.
 (function(){
 var canvas = document.getElementById('canvas1')
 var ctx = canvas.getContext('2d')
+ctx.fillStyle = 'rgba(255,255,255,0.05)'
 
 function getPoint(t) {
   let x = 200 + 100 * Math.sin(t);
@@ -79,6 +83,7 @@ requestAnimationFrame(function render(t) {
    ctx.lineTo(point2.x, point2.y);
    ctx.stroke();
    frame += 0.01;
+   if (frame % 0.5 < 0.02) ctx.fillRect(0, 0, 400, 400);
    requestAnimationFrame(render);
 })
 })()
@@ -106,6 +111,7 @@ to `setTimeout` with a 500ms delay, so the animation is slower and easier to see
 (function() {
 var canvas = document.getElementById('canvas2')
 var ctx = canvas.getContext('2d')
+ctx.fillStyle = 'rgba(255,255,255,0.05)'
 
 function getPoint(t) {
   let x = 200 + 100 * Math.sin(t);
@@ -123,6 +129,7 @@ setTimeout(function render(t) {
    ctx.lineTo(200, 200);
    ctx.stroke();
    frame += 0.1;
+   if (frame % 1 < 0.2) ctx.fillRect(0, 0, 400, 400);
    setTimeout(render, 500);
 }, 500)
 })()
