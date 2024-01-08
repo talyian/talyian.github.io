@@ -52,7 +52,8 @@ to be called before the screen gets redrawn. This calls the function once, but
 if we have the function itself request another animation frame, then it fires about
 60 times per second, depending on the screen refresh rate.
 
-Every frame, we move to
+Every frame, we move from the previous point to the new point and draw that small
+line segment.
 
 #+begin_src html
 <canvas id=canvas1 width=400 height=400> </canvas>
@@ -93,6 +94,9 @@ requestAnimationFrame(function render(t) {
 It'd be nice to animate a rotating "bar" showing the radius of the circle. Can
 we try drawing a line from the center of the canvas to the current point on the
 circle?
+
+(I've switched from `requestAnimationFrame`, which runs like 60 times per second
+to `setTimeout` with a 500ms delay, so the animation is slower and easier to see)
 
 #+begin_src html
 <canvas id=canvas2 width=400 height=400> </canvas>

@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-01-08 Mon 01:30 -->
+<!-- 2024-01-08 Mon 02:28 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Notes</title>
@@ -201,18 +201,19 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org50d077d">1. Set up a canvas for rendering</a></li>
-<li><a href="#org0811a79">2. Drawing a circle</a></li>
-<li><a href="#orgf471e58">3. Varying it over time</a></li>
-<li><a href="#org93b028b">4. Drawing the &ldquo;arm&rdquo; of the circle</a></li>
+<li><a href="#org4f58576">1. Set up a canvas for rendering</a></li>
+<li><a href="#orga008788">2. Drawing a circle</a></li>
+<li><a href="#orgf3824ac">3. Varying it over time</a></li>
+<li><a href="#org2366035">4. Drawing the &ldquo;arm&rdquo; of the circle</a></li>
+<li><a href="#orgdb74b25">5. Drawing the &ldquo;arm&rdquo; of the circle, but erasing the previous arm</a></li>
 </ul>
 </div>
 </div>
 <p>
 Lets draw the new years spirograph! Step by Step javascript examples
 </p>
-<div id="outline-container-org50d077d" class="outline-2">
-<h2 id="org50d077d"><span class="section-number-2">1.</span> Set up a canvas for rendering</h2>
+<div id="outline-container-org4f58576" class="outline-2">
+<h2 id="org4f58576"><span class="section-number-2">1.</span> Set up a canvas for rendering</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 We start by setting up a canvas on the page to draw the output to. in Javascript
@@ -222,8 +223,8 @@ important APIs are the canvas <code>lineTo</code> command
 </p>
 </div>
 </div>
-<div id="outline-container-org0811a79" class="outline-2">
-<h2 id="org0811a79"><span class="section-number-2">2.</span> Drawing a circle</h2>
+<div id="outline-container-orga008788" class="outline-2">
+<h2 id="orga008788"><span class="section-number-2">2.</span> Drawing a circle</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 To draw a circle, we take a variable <code>t</code> to represent time, and then slowly increase it
@@ -261,8 +262,8 @@ ctx.stroke()
 <script src=ex1.js> </script>
 </div>
 </div>
-<div id="outline-container-orgf471e58" class="outline-2">
-<h2 id="orgf471e58"><span class="section-number-2">3.</span> Varying it over time</h2>
+<div id="outline-container-orgf3824ac" class="outline-2">
+<h2 id="orgf3824ac"><span class="section-number-2">3.</span> Varying it over time</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 Instead of drawing it all at once, we can draw the circle slowly just by drawing
@@ -273,7 +274,8 @@ if we have the function itself request another animation frame, then it fires ab
 </p>
 
 <p>
-Every frame, we move to
+Every frame, we move from the previous point to the new point and draw that small
+line segment.
 </p>
 
 <div class="org-src-container">
@@ -311,13 +313,18 @@ requestAnimationFrame(<span style="color: #51afef;">function</span> render(<span
 <script src=ex2.js> </script>
 </div>
 </div>
-<div id="outline-container-org93b028b" class="outline-2">
-<h2 id="org93b028b"><span class="section-number-2">4.</span> Drawing the &ldquo;arm&rdquo; of the circle</h2>
+<div id="outline-container-org2366035" class="outline-2">
+<h2 id="org2366035"><span class="section-number-2">4.</span> Drawing the &ldquo;arm&rdquo; of the circle</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 It&rsquo;d be nice to animate a rotating &ldquo;bar&rdquo; showing the radius of the circle. Can
 we try drawing a line from the center of the canvas to the current point on the
 circle?
+</p>
+
+<p>
+(I&rsquo;ve switched from `requestAnimationFrame`, which runs like 60 times per second
+to `setTimeout` with a 500ms delay, so the animation is slower and easier to see)
 </p>
 
 <div class="org-src-container">
@@ -337,17 +344,17 @@ circle?
 }
 
 <span style="color: #51afef;">var</span> <span style="color: #dcaeea;">frame</span> = <span style="color: #da8548; font-weight: bold;">0</span>;
-requestAnimationFrame(<span style="color: #51afef;">function</span> render(<span style="color: #dcaeea;">t</span>) {
+setTimeout(<span style="color: #51afef;">function</span> render(<span style="color: #dcaeea;">t</span>) {
    ctx.beginPath();
    <span style="color: #51afef;">var</span> <span style="color: #dcaeea;">point</span> = getPoint(frame);
-   <span style="color: #51afef;">var</span> <span style="color: #dcaeea;">point2</span> = getPoint(frame + <span style="color: #da8548; font-weight: bold;">0.01</span>);
-   ctx.moveTo(<span style="color: #da8548; font-weight: bold;">200</span>, <span style="color: #da8548; font-weight: bold;">200</span>);
-   ctx.lineTo(point.x, point.y);
+   <span style="color: #51afef;">var</span> <span style="color: #dcaeea;">point2</span> = getPoint(frame + <span style="color: #da8548; font-weight: bold;">0.1</span>);
+   ctx.moveTo(point.x, point.y);
    ctx.lineTo(point2.x, point2.y);
+   ctx.lineTo(<span style="color: #da8548; font-weight: bold;">200</span>, <span style="color: #da8548; font-weight: bold;">200</span>);
    ctx.stroke();
-   frame += <span style="color: #da8548; font-weight: bold;">0.01</span>;
-   requestAnimationFrame(render);
-})
+   frame += <span style="color: #da8548; font-weight: bold;">0.1</span>;
+   setTimeout(render, <span style="color: #da8548; font-weight: bold;">500</span>);
+}, <span style="color: #da8548; font-weight: bold;">500</span>)
 })()
 </pre>
 </div>
@@ -356,10 +363,18 @@ requestAnimationFrame(<span style="color: #51afef;">function</span> render(<span
 <script src=ex3.js> </script>
 </div>
 </div>
+<div id="outline-container-orgdb74b25" class="outline-2">
+<h2 id="orgdb74b25"><span class="section-number-2">5.</span> Drawing the &ldquo;arm&rdquo; of the circle, but erasing the previous arm</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+The problem with the previous example is that
+</p>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: GALAXIAN</p>
-<p class="date">Created: 2024-01-08 Mon 01:30</p>
+<p class="date">Created: 2024-01-08 Mon 02:28</p>
 </div>
 </body>
 </html>
