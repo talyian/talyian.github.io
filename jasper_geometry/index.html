@@ -5,52 +5,120 @@
 <canvas id=canvas0 width=800 height=800 style='background:black'> </canvas>
 <canvas id=canvas1 width=800 height=800> </canvas>
 <script>
+// canvas1 is the "arm canvas." This is the canvas on which we draw the white "arm" lines.
+// We need to clear this canvas every frame, because we're drawing the arm at a
+// new position.
 let ctx_arms = canvas1.getContext('2d')
+// the "stroke style" is white, so 255 red, green, and blue, and 1 is the opacity (fully opaque)
 ctx_arms.strokeStyle = 'rgba(255,255,255,1)';
+// lineWidth 1.3 gives a slightly heavier line
 ctx_arms.lineWidth = 1.3;
-ctx_arms.fillRect(0,0,800,800);
 
+// canvas0 is the "colored curves" canvas. Every frame we draw a little bit more onto
+// this canvas, but we don't really clear the whole canvas, so we continue to see
+// what we draw on the previous frame.
 let ctx = canvas0.getContext('2d')
+// This is a very lightly transparent black fill. we apply this every few frames, and
+// it fades out the curves gradually over time. I think this slight fade makes
+// the animation a bit more interesting overall.
 ctx.fillStyle = 'rgba(0,0,0, 0.05)';
 
-function Turtle(N) {
-  this.N = N;
-  this.x = 0;
-  this.y = 0;
-  this.color = `rgb(${127 + 127 * Math.sin(N)}, ${127 + 127 * Math.sin(N+2)}, 100)`;
-}
-
-Turtle.prototype.draw_segment = function(t) {
-  let c1 = {x:Math.sin(this.N + (this.N + 1) * t), y:Math.cos(this.N + (this.N + 1) * t)};
-  let c2 = {x:Math.cos((5 * this.N + 6)*t), y:Math.sin((5 * this.N + 6) * t)};
-  // draw circle arms
-  ctx_arms.beginPath();
-  ctx_arms.moveTo(400,400);
-  ctx_arms.lineTo(400 + 50 * this.N * c1.x, 400 + 50 * this.N * c1.y);
-  ctx_arms.lineTo(400 + 50 * this.N * c1.x + 25 * c2.x, 400 + 50 * this.N * c1.y + 25 * c2.y);
-  ctx_arms.stroke();
-
-  // draw colored path
-  let new_x = 2 * this.N * c1.x + c2.x
-  let new_y = 2 * this.N * c1.y + c2.y
-  if (this.x || this.y) {
-     ctx.strokeStyle = this.color
-     ctx.beginPath();
-     ctx.moveTo(25 * this.x + 400, 25 * this.y + 400);
-     ctx.lineTo(25 * new_x + 400, 25 * new_y + 400);
-     ctx.stroke()
+// A "turtle" is an instance of a curve. it draws 
+// two things: two white line segments showing the radius of a small circle orbiting in a
+// large circle, and a colored curve tracing the outline of a rotating point
+// on the small circle.
+class Turtle {
+  constructor(N) { 
+    this.N = N;
+    this.x = 0;
+    this.y = 0;
+    // the "radius" is always white, but the path of each turtle is
+    // a function of the turtle's number. This is pretty arbitrary, and we 
+    // can choose whatever colors we want, but if we
+    // choose red = 127 + 127 * sin(N) and green = 127 + 126 * Math.sin(N+2)
+    // this produces a range of colors where turtle 1 is orange, then we go
+    // through a range of magenta, dark green, light green, and yellow.
+    this.color = `rgb(${127 + 127 * Math.sin(N)}, ${127 + 127 * Math.sin(N+2)}, 100)`
   }
-  this.x = new_x;
-  this.y = new_y;
+  
+  // draws two white line segments tracing out the radius of a small circle revolving
+  // around a big circle.
+  draw_radius(t, c1, c2) {
+    ctx_arms.beginPath();
+    // move to the center of the 800x800 canvas
+    ctx_arms.moveTo(400,400);
+    // trace out the radius of circle `c1`. the radius has length `N * 50` pixels, 
+    // so turtle 1 has a radius of 50 pixels, and turtle 7 has a radius of 350 pixels.
+    ctx_arms.lineTo(400 + 50 * this.N * c1.x, 400 + 50 * this.N * c1.y);
+    // trace out the radius of circle `c2`, which always has radius 25, but is offset from
+    // the previous point on circle `c1`. 
+    ctx_arms.lineTo(400 + 50 * this.N * c1.x + 25 * c2.x, 400 + 50 * this.N * c1.y + 25 * c2.y);
+    ctx_arms.stroke();
+  }
+
+  // draws a little bit of the colored path traced out by the two circles.
+  draw_segment(t, c1, c2) {
+    // c1 is the big circle, c2 is the small 25-radius circle orbiting the big circle.
+    // we calculate a new point (new_x, new_y). We will save the value of the new point into the
+    // turtle's fields `this.x` and `this.y`, so every frame we draw a small colored line segment 
+    // from the turtle's previous position to the new position.
+    let new_x = 50 * this.N * c1.x + 25 * c2.x + 400
+    let new_y = 50 * this.N * c1.y + 25 * c2.y + 400
+    if (this.x || this.y) {
+      ctx.strokeStyle = this.color
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(new_x, new_y);
+      ctx.stroke()
+    }
+    this.x = new_x;
+    this.y = new_y;
+  }
+
+  draw (t) {
+    // point1 is a rotating point on a circle. the circle is plotted by sin(u), cos(u), 
+    // where u is `N + (N + 1)*t`. As N, the parameter to the turtle increases, this circle
+    // spins faster and faster, because of the (N + 1) multiplier on t. Additionally, it starts
+    // off at a different position because of the `N` added at the beginning.
+    let point1 = {x:Math.sin(this.N + (this.N + 1) * t), y:Math.cos(this.N + (this.N + 1) * t)};
+    // point2 is a rotating point on a fast circle. the circle is plotted by sin(u), cos(u), 
+    // where u is `(5 * N + 6) * t`. Even when N = 0 or 1, this already resolves to 6 * t or 11 *t, 
+    // which means this circle is rotating pretty fast. As N gets larger, this circle rotates even faster. 
+    let point2 = {x:Math.cos((5 * this.N + 6)*t), y:Math.sin((5 * this.N + 6) * t)};
+
+    this.draw_radius(t, point1, point2);
+    this.draw_path(t, point1, point2);
+  }
+
 }
 
+// generate a list of turtles from 1 to 7. Each turtle saves its
+// argument as `this.N`, and N influences its color, radius, and speed.
 let turtles = [], frame = 0;
 for(var i = 1; i < 8;i++) turtles.push(new Turtle(i));
+
+// requestAnimationFrame asks the browser to call the provided function before
+// the next time it repaints the page. If we recursively requestAnimationFrame 
+// inside the render function, the browser will call this on every screen refresh,
+// which is something like 60 times a second depending on your display.
 requestAnimationFrame(function render() {
+  // "frame" tracks the "t" parameter used by the `draw` method of the turtle.
+  // we increment it by 0.002, which means it takes 500 frames to increase t by 1.
+  // if we increase this increment amount, the turtles will all move faster.
   frame+=0.002;
-  ctx_arms.clearRect(0,0,800,800);
+  
+  // frame * 500 increases by one each call. once every 30 frames, it will be roughly
+  // divisible by 30, so % 30 < 0.1 will be true and we will "fill" canvas0.
+  // the fillstyle is a 5% opaque black, so very tranparent. This serves to very slightly
+  // darken the paths already drawn. When we darken the paths every 30 frames by 5%,
+  // this serves to very slightly fade out the paths. We could choose a more frequent count
+  // or also a higher opacity to get a more aggressive fade.
   if ((frame * 500) % 30 < 0.1) { ctx.fillRect(0,0,800,800); }
-  turtles.forEach((t)=> t.draw_segment(frame));
+
+  // draw all the turtles!
+  turtles.forEach((t)=> t.draw(frame));
+
+  // schedule ourself to be called again before the next repaint.
   requestAnimationFrame(render);
 })
 </script>
