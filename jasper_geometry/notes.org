@@ -1,0 +1,134 @@
+#+title:Notes
+
+Lets draw the new years spirograph! Step by Step javascript examples
+
+* Set up a canvas for rendering
+
+We start by setting up a canvas on the page to draw the output to. in Javascript
+we get a 2d context object, which we use to issue draw commands from. The
+important APIs are the canvas ~lineTo~ command
+(https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineTo)
+
+* Drawing a circle
+
+To draw a circle, we take a variable ~t~ to represent time, and then slowly increase it
+while plotting out the function ~x = sin(t), y = cos(t)~. However, we need to scale the sine/cosine circle
+to the dimensions of the canvas, which is currently 400 pixels wide and 400 pixels tall. If we add
+200 to each coordinate, this starts us at ~(200, 200)~ the center point of the canvas, and if we
+multiply the sine and cosine by 100, this gives us a circle of radius 100:
+
+#+begin_src html
+<canvas id=canvas0 width=400 height=400> </canvas>
+#+end_src
+
+#+begin_src javascript :tangle ex1.js
+var canvas = document.getElementById('canvas0')
+var ctx = canvas.getContext('2d')
+
+function getPoint(t) {
+  let x = 200 + 100 * Math.sin(t);
+  let y = 200 + 100 * Math.cos(t);
+  return {x:x, y:y}
+}
+
+ctx.beginPath()
+for(var t = 0; t <= 2 * Math.PI + 0.1; t += 0.1) {
+  let point = getPoint(t);
+  ctx.lineTo(point.x, point.y);
+}
+ctx.stroke()
+#+end_src
+
+#+begin_export html
+<canvas id=canvas0 width=400 height=400> </canvas>
+<script src=ex1.js> </script>
+#+end_export
+
+* Varying it over time
+
+Instead of drawing it all at once, we can draw the circle slowly just by drawing
+segments in a ~requestAnimationFrame~ loop. This is a function that lets us schedule a function
+to be called before the screen gets redrawn. This calls the function once, but
+if we have the function itself request another animation frame, then it fires about
+60 times per second, depending on the screen refresh rate.
+
+Every frame, we move to
+
+#+begin_src html
+<canvas id=canvas1 width=400 height=400> </canvas>
+#+end_src
+
+#+begin_src javascript :tangle ex2.js
+(function(){
+var canvas = document.getElementById('canvas1')
+var ctx = canvas.getContext('2d')
+
+function getPoint(t) {
+  let x = 200 + 100 * Math.sin(t);
+  let y = 200 + 100 * Math.cos(t);
+  return {x:x, y:y}
+}
+
+var frame = 0;
+requestAnimationFrame(function render(t) {
+   ctx.beginPath();
+   var point = getPoint(frame);
+   var point2 = getPoint(frame + 0.01);
+   ctx.moveTo(point.x, point.y);
+   ctx.lineTo(point2.x, point2.y);
+   ctx.stroke();
+   frame += 0.01;
+   requestAnimationFrame(render);
+})
+})()
+#+end_src
+
+#+begin_export html
+<canvas id=canvas1 width=400 height=400> </canvas>
+<script src=ex2.js> </script>
+#+end_export
+
+* Drawing the "arm" of the circle
+
+It'd be nice to animate a rotating "bar" showing the radius of the circle. Can
+we try drawing a line from the center of the canvas to the current point on the
+circle?
+
+#+begin_src html
+<canvas id=canvas2 width=400 height=400> </canvas>
+#+end_src
+
+#+begin_src javascript :tangle ex3.js
+(function() {
+var canvas = document.getElementById('canvas2')
+var ctx = canvas.getContext('2d')
+
+function getPoint(t) {
+  let x = 200 + 100 * Math.sin(t);
+  let y = 200 + 100 * Math.cos(t);
+  return {x:x, y:y}
+}
+
+var frame = 0;
+setTimeout(function render(t) {
+   ctx.beginPath();
+   var point = getPoint(frame);
+   var point2 = getPoint(frame + 0.1);
+   ctx.moveTo(point.x, point.y);
+   ctx.lineTo(point2.x, point2.y);
+   ctx.lineTo(200, 200);
+   ctx.stroke();
+   frame += 0.1;
+   setTimeout(render, 500);
+}, 500)
+})()
+#+end_src
+
+#+begin_export html
+<canvas id=canvas2 width=400 height=400> </canvas>
+<script src=ex3.js> </script>
+#+end_export
+
+* Drawing the "arm" of the circle, but erasing the previous arm
+
+The problem with the previous example is that
