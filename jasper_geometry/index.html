@@ -108,12 +108,12 @@ requestAnimationFrame(function render() {
   frame+=0.002;
   
   // frame * 500 increases by one each call. once every 30 frames, it will be roughly
-  // divisible by 30, so % 30 < 0.1 will be true and we will "fill" canvas0.
+  // divisible by 30, so % 80 < 0.1 will be true and we will "fill" canvas0.
   // the fillstyle is a 5% opaque black, so very tranparent. This serves to very slightly
   // darken the paths already drawn. When we darken the paths every 30 frames by 5%,
   // this serves to very slightly fade out the paths. We could choose a more frequent count
   // or also a higher opacity to get a more aggressive fade.
-  if ((frame * 500) % 30 < 0.1) { ctx.fillRect(0,0,800,800); }
+  if ((frame * 500) % 80 < 0.1) { ctx.fillRect(0,0,800,800); }
 
   // draw all the turtles!
   turtles.forEach((t)=> t.draw(frame));
